@@ -12,7 +12,7 @@ structures of dictionaries, lists and sets.
 
 
 
-__version__ = "1.0 (2017-09-22)"
+__version__ = "1.01 (2017-09-22)"
 
 
 
@@ -137,7 +137,7 @@ def _deepmerge(a, b, replace, list_as_set, path):
     else:
         raise(TypeError("merging incompatible or illegal types %s and %s at "
                         "%s" % (_strquote(a), _strquote(b),
-                                ".".join(path + [item]))))
+                                ".".join(path) if path else ".")))
 
 
 
