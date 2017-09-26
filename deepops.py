@@ -12,7 +12,7 @@ structures of dictionaries, lists and sets.
 
 
 
-__version__ = "1.01 (2017-09-22)"
+__version__ = "1.1 (2017-09-26)"
 
 
 
