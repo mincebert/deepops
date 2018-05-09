@@ -211,7 +211,8 @@ def _deepremoveitems(a, b, path):
         # allow empty dictionaries to provide a way to remove a complete item
         # from the dictionary)
 
-        elif isinstance(b, dict):
+        # We already checked that b is a valid type, so it must now be a dict
+        else:
             for item in b:
                 if not (b[item]):
                     if item in a:
@@ -240,7 +241,8 @@ def _deepremoveitems(a, b, path):
         # if the item is not empty, we recursively process the two dictionaries
         # to remove the corresponding items
 
-        elif isinstance(b, dict):
+        # We already checked that b is a valid type, so it must now be a dict
+        else:
             for item in b:
                 if item in a:
                     if not (b[item]):
