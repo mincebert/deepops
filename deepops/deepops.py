@@ -9,7 +9,7 @@ This module contains functions to perform operations on hierarchical
 structures of dictionaries, lists and sets.
 """
 
-__version__ = "1.1 (2017-09-26)"
+__version__ = "1.2 (2018-05-09)"
 
 
 # --- internal functions ---
