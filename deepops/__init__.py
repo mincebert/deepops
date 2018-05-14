@@ -1,1 +1,2 @@
-from deepops.deepops import deepmerge, deepremoveitems
+__all__ = ['deepmerge', 'deepremoveitems']
+from deepops.deepops import *
