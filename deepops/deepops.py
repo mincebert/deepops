@@ -3,40 +3,48 @@
 # Copyright (C) Robert Franklin <rcf@mince.net>
 
 
+
 """Deep operations module.
 
 This module contains functions to perform operations on hierarchical
 structures of dictionaries, lists and sets.
 """
 
-__version__ = "1.2 (2018-05-09)"
+
+__version__ = "1.3 (2020-03-20)"
 
 
-# --- internal functions ---
+
+# --- functions ---
 
 
-def _strquote(s):
-    """Returns the string representation of an object, surrounding it
-    with single quotes, if it's a string (to make it clear it's a
-    string and enclose spaces).
 
-    This module uses it in various exception messages.
-
-    Keyword arguments:
-
-    s -- the item to be returned, string or other
+def _printable_path(path):
+    """Returns a printable version of a path to an object in a
+    hierarchy for use in error messages.  This is the supplied path,
+    unless it's empty (i.e. the top of the hierarchy), in which case a
+    string representing the top is returned.
     """
 
-    return ("'%s'" % s) if isinstance(s, str) else s
+    return path or "<top>"
 
 
-# --- external functions ---
+
+def _sub_path(path, sub_item):
+    """Returns a new path string, extended by the supplied sub item.
+    The sub item is converted to a string with repr(), to add quotes
+    around strings, if they are the item.
+    """
+
+    return path + ("[%s]" % repr(sub_item))
+
 
 
 # deepmerge
 
 
-def _deepmerge(a, b, replace, list_as_set, path):
+
+def _deepmerge(a, b, replace, list_as_set, change_types, path=""):
     """Backend function for deepmerge() that does the actual work.  It
     is defined privately to not offer the 'path' argument.
 
@@ -44,28 +52,30 @@ def _deepmerge(a, b, replace, list_as_set, path):
 
     Keyword arguments (in addition to deepmerge()):
 
-    path -- this is a list of keys identifying the position in the
-    hierarchy of dictionaries being merged: it is used when raising an
-    exception to explain where the problem lies
+    path -- a string giving the 'path' through the structures so far
+    (in recursive calls to this function), in the format
+    '[...][...]...'; it is used when a problem is encountered, to
+    report where the issue lies; the default is the top level
     """
+
 
     # if the items being merged are both lists, what we do depends on
     # the list_as_set option...
 
     if isinstance(a, list) and isinstance(b, list):
-        # ... if it's enabled, we treat the list 'a' as a set and only
-        # add items from 'b' to it if they don't exist already
-
         if list_as_set:
-            for item in b:
-                if item not in a:
-                    a.append(item)
+            # it's enabled, so we treat the list 'a' as a set and only
+            # add items from 'b' to it if they don't exist already
 
-        # ... or, if it's disabled, we just append the corresponding
-        # list in 'b' to 'a' (potentially adding duplicates)
+            a.extend([ i for i in b if i not in a ])
 
         else:
+
+            # it's disabled, so we just append the corresponding list
+            # in 'b' to 'a' (potentially adding duplicates)
+
             a.extend(b)
+
 
     # if the items being merged are both sets, we just add the missing
     # items in 'b'
@@ -73,41 +83,55 @@ def _deepmerge(a, b, replace, list_as_set, path):
     elif isinstance(a, set) and isinstance(b, set):
         a.update(b)
 
+
     # if the items being merged are both dictionaries, we work through the
-    # items in 'b' in see if they're present in 'a'...
+    # items in 'b' to see if they're present in 'a'...
 
     elif isinstance(a, dict) and isinstance(b, dict):
         for item in b:
             if item in a:
                 # the item is present - what we do now depends on the type of
-                # that object (we only check 'a')...
+                # the objects...
 
-                if (isinstance(a[item], dict) or
-                        isinstance(a[item], list) or
-                        isinstance(a[item], set)):
+                if (isinstance(a[item], (list, set, dict))
+                    and (isinstance(b[item], (list, set, dict)))):
 
-                    # the item is a compound type (dictionary, list or set) -
+                    # the item is a compound type (list, set or dictionary) -
                     # recursively merge them
                     #
-                    # we don't need to check if the two items are different
-                    # types as the function will do that itself
+                    # we don't need to check if they're the same as the
+                    # recursive call will do that
 
-                    _deepmerge(
-                        a[item], b[item], replace, list_as_set, path + [item])
+                    _deepmerge(a[item], b[item], replace, list_as_set,
+                               change_types, _sub_path(path, item))
+
+                elif (isinstance(a[item], (list, set, dict))
+                      or (isinstance(b[item], (list, set, dict)))):
+
+                    # one of the items is a compound type, but not the other,
+                    # so we can't change the type
+                    #
+                    # (we could technically, but that would be inconsistent
+                    # with the behaviour at the top level)
+
+                    raise TypeError(
+                              "deepmerge at: %s cannot merge compound and "
+                              "non-compound types: %s and: %s"
+                                  % (_sub_path(path, item), type(a[item]),
+                                     type(b[item])))
 
                 else:
-                    # the item in 'a' is a simple type - check the
-                    # corresponding item in 'b' is also simple and replace it
-                    # (if that's enabled), otherwise raise an exception
+                    # the corresponding items in 'a' and 'b' are both
+                    # non-compound types, so we can just replace it
 
-                    if (isinstance(b[item], dict) or
-                            isinstance(b[item], list) or
-                            isinstance(b[item], set)):
-                        raise (TypeError("cannot replace simple type %s with "
-                                         "non-simple type %s at %s" %
-                                         (_strquote(a[item]),
-                                          _strquote(b[item]),
-                                          ".".join(path + [item]))))
+                    if ((type(a[item]) != type(b[item]))
+                        and (not change_types)):
+
+                        raise TypeError(
+                                  "deepmerge at: %s can't compare or change "
+                                  "types: %s and: %s"
+                                      % (_sub_path(path, item),
+                                         type(a[item]), type(b[item])))
 
                     if replace:
                         a[item] = b[item]
@@ -119,31 +143,36 @@ def _deepmerge(a, b, replace, list_as_set, path):
                 a[item] = b[item]
 
     else:
-        raise (TypeError("merging incompatible or illegal types %s and %s at "
-                         "%s" % (_strquote(a), _strquote(b),
-                                 ".".join(path) if path else ".")))
+        raise TypeError(
+                  "deepmerge at: %s incompatible or unhandled types: %s and: "
+                  "%s" % (_printable_path(path), type(a), type(b)))
 
 
-def deepmerge(a, b, replace=True, list_as_set=False):
-    """Merge two dictionaries - 'a' and 'b' - the items in 'b' are
-    merged into 'a', in place, modifying 'a'.
+
+def deepmerge(a, b, replace=True, list_as_set=False, change_types=False):
+    """Recursively merge two nested compound objects - 'a' and 'b': the
+    items in 'b' are merged into 'a', in place, modifying 'a'.  Both
+    'a' and 'b' must be compound types (a list, set or dictionary) at
+    the top level and can contain further compound types or simple
+    types, nested within.
 
     What happens for any particular item depends on its type:
 
     For lists, the corresponding items in 'b' are appended.  This will
-    create duplicates, if they're in both lists.
+    create duplicates, if they're in both lists (unless list_as_set is
+    enabled).
 
     For sets, the result is the union of the items in 'a' and 'b'.
+
+    For dictionaries (including the top-level call), the merge is
+    applied recursively, with items in 'b' added to 'a' by merging
+    recursively.  Other types are merged according to the above rules.
 
     For simple types (integers, strings, etc.), the value in 'b'
     replaces the value in 'a'.
 
-    For dictionaries (including the top-level call), the merge is
-    applied recursively, with items in 'b' are added to 'a' by merging
-    recursively.  Other types are merged according to the above rules.
-
     If one of the values is a simple type and the other is a compound
-    type (list or dictionary) then a TypeError() exception is raised.
+    type (list, set or dictionary) then a TypeError() exception is raised.
 
     Keyword arguments:
 
@@ -162,15 +191,21 @@ def deepmerge(a, b, replace=True, list_as_set=False):
     sets (= True), which will only add items from 'b' if they don't
     already exist in 'a' (although note that it won't filter out
     duplicates already in 'a')
+
+    change_types -- this specifies whether a value of one simple type
+    can replace that of a different (simple) type (for example, a
+    string replacing an integer)
     """
 
-    _deepmerge(a, b, replace, list_as_set, [])
+    _deepmerge(a, b, replace, list_as_set, change_types)
+
 
 
 # deepremoveitems
 
 
-def _deepremoveitems(a, b, path):
+
+def _deepremoveitems(a, b, path=""):
     """Backend function for deepremoveitems() that does the actual
     work.  It is defined privately to not offer the 'path' argument.
 
@@ -178,50 +213,58 @@ def _deepremoveitems(a, b, path):
 
     Keyword arguments (in addition to deepremoveitems()):
 
-    path -- this is a list of keys identifying the position in the
-    hierarchy of dictionaries being processed: it is used when raising
-    an exception to explain where the problem lies
+    path -- a string giving the 'path' through the structures so far
+    (in recursive calls to this function), in the format
+    '[...][...]...'; it is used when a problem is encountered, to
+    report where the issue lies; the default is the top level
     """
+
 
     # we cannot remove a simple type (one that is not a dictionary, list or
     # set), regardless of the type of object we're removing them from (we'll
     # check for that later), so just abort with an exception
 
-    if not (isinstance(b, dict) or isinstance(b, list) or isinstance(b, set)):
-        raise (TypeError("cannot remove simple type %s at %s" %
-                         (_strquote(b), ".".join(path) if path else ".")))
+    if not isinstance(b, (list, set, dict)):
+        raise TypeError("deepremoveitems at: %s cannot remove simple type: "
+                        "%s" % (_printable_path(path), type(b)))
+
 
     # if the object we're removing from is a list or set...
 
-    if isinstance(a, list) or isinstance(a, set):
+    if isinstance(a, (list, set)):
         # ... and the object specifying what to remove is also a list or set,
         # we just remove any items that are in the removal list
 
-        if isinstance(b, list) or isinstance(b, set):
+        if isinstance(b, (list, set)):
             for item in b:
                 if item in a:
                     a.remove(item)
 
-        # ... or, if the object specifying what to remove is a dictionary, we
-        # remove any items matching the keys of the dictionary, as long as the
-        # dictionary is empty
-        #
-        # if the dictionary is not empty, we raise an exception as that implies
-        # want to remove specific items from another dictionary (we have to
-        # allow empty dictionaries to provide a way to remove a complete item
-        # from the dictionary)
 
-        # We already checked that b is a valid type, so it must now be a dict
+        # ... or, if the object specifying what to remove is a dictionary
+        # (since we checked above it was a list, set or dictionary and we've
+        # already handled lists and sets), we remove any items matching the
+        # keys of the dictionary, as long as the value for that key is 'empty'
+        # (is not True)
+        #
+        # if the dictionary is not empty, we raise an exception as that
+        # implies want to remove specific items from another dictionary and
+        # this is a list or a set
+
         else:
             for item in b:
-                if not (b[item]):
+                if not b[item]:
                     if item in a:
                         a.remove(item)
+
                 else:
-                    raise (ValueError("cannot remove non-empty dictionary item "
-                                      "%s from non-dictionary %s at %s" %
-                                      (_strquote(item), _strquote(a),
-                                       ".".join(path) if path else ".")))
+                    raise ValueError(
+                              "deepremoveitems at: %s cannot remove "
+                              "non-empty dictionary item: %s from "
+                              "non-dictionary type: %s"
+                                  % (_printable_path(path), repr(item),
+                                     type(a)))
+
 
     # if the object we're removing from is a dictionary...
 
@@ -229,39 +272,48 @@ def _deepremoveitems(a, b, path):
         # ... and the object specifying what to remove is a list or set, we
         # just remove the keys in that list or set, if they exist
 
-        if isinstance(b, list) or isinstance(b, set):
+        if isinstance(b, (list, set)):
             for item in b:
                 if item in a:
                     a.pop(item)
 
-        # ... or, if the object specifying what to remove is also a dictionary,
-        # we either remove the entire key, if the corresponding dictionary item
-        # is empty
-        #
-        # if the item is not empty, we recursively process the two dictionaries
-        # to remove the corresponding items
 
-        # We already checked that b is a valid type, so it must now be a dict
+        # ... or, if the object specifying what to remove is also a
+        # dictionary (since we know it's a list, set or dictionary and we've
+        # already handled lists and sets), what we do depends whether the
+        # items in it are empty or not...
+        #
+        # if the item to remove is empty, we remove the entire corresponding
+        # item
+        #
+        # if the item to remove is not empty, we recursively process the two
+        # dictionaries to remove the corresponding items
+
         else:
             for item in b:
                 if item in a:
-                    if not (b[item]):
+                    if not b[item]:
                         a.pop(item)
                     else:
-                        _deepremoveitems(a[item], b[item], path + [item])
+                        _deepremoveitems(a[item], b[item],
+                                         _sub_path(path, item))
+
 
     # if the object we're removing from is not one of the above - probably a
     # simple type - we're raise an exception as that's not supported
 
     else:
-        raise (TypeError("cannot remove items from simple type %s at %s" %
-                         (a, ".".join(path) if path else ".")))
+        raise TypeError(
+                  "deepremoveitems at: %s incompatible or unhandled types: "
+                  "%s and: %s" % (_printable_path(path), type(a), type(b)))
+
 
 
 def deepremoveitems(a, b):
-    """Remove items 'b' from a object 'a', modifying object 'a' in
-    place.  Both 'a' and 'b' must be compound types (a dictionary, list
-    or set).
+    """Recursively remove items from nested object 'b' from nested
+    object 'a', modifying object 'a' in place.  Both 'a' and 'b' must
+    be compound types (a list, set or dictionary) at the top level and
+    can contain further compound types or simple types, nested within.
 
     What happens depends on the types of corresponding items in 'a' and
     'b':
@@ -298,4 +350,4 @@ def deepremoveitems(a, b):
     level
     """
 
-    _deepremoveitems(a, b, [])
+    _deepremoveitems(a, b)

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
+
 # test_deepops.py - unittests for deepops
+
 
 import unittest
 import deepops
@@ -157,3 +159,7 @@ class TestDeepOps(unittest.TestCase):
                       "e": {7, 8}}
         deepops.deepremoveitems(self.x, self.z_list)
         self.assertEqual(x_remove_z, self.x)
+
+
+if __name__ == '__main__':
+    unittest.main()
