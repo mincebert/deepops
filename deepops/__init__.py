@@ -1,5 +1,5 @@
-__all__ = ['deepmerge', 'deepremoveitems']
+__all__ = ['deepmerge', 'deepremoveitems', 'deepdiff']
 
-__version__ = "1.3.2"
+__version__ = "1.4"
 
 from deepops.deepops import *

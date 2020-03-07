@@ -6,7 +6,9 @@
 
 import unittest
 
-from deepops import deepmerge, deepremoveitems
+from deepops import deepmerge, deepremoveitems, deepdiff
+
+from copy import deepcopy
 
 
 class TestDeepOps(unittest.TestCase):
@@ -183,6 +185,47 @@ class TestDeepOps(unittest.TestCase):
                       "e": {7, 8}}
         deepremoveitems(self.x, self.z_list)
         self.assertEqual(x_remove_z, self.x)
+
+
+    # deepdiff() tests
+
+    def test_deepops_diff_complex(self):
+        x_diff_y_remove = {"c": ['x'],
+                           "d": {"n": None,
+                                 "p": [1, 2],
+                                 "q": {"t": [1]}},
+                           "e": {7}}
+
+        x_diff_y_update = {"a": "y",
+                           "b": 6,
+                           "c": ["y", "x"],
+                           "d": {"m": "y",
+                                 "o": 4,
+                                 "p": [2, 3],
+                                 "q": {"t": [2]}},
+                           "e": {9}}
+
+        diff_remove, diff_update = deepdiff(self.x, self.y)
+        self.assertEqual(x_diff_y_remove, diff_remove)
+        self.assertEqual(x_diff_y_update, diff_update)
+
+    def test_deepops_diff_remove_update(self):
+        diff_remove, diff_update = deepdiff(self.x, self.y)
+        deepremoveitems(self.x, deepcopy(diff_remove))
+        deepmerge(self.x, deepcopy(diff_update))
+        self.assertEqual(self.x, self.y)
+
+    def test_deepops_diff_illegal_type(self):
+        self.assertRaises(TypeError, deepdiff, self.x, {"a": 1})
+
+    def test_deepops_diff_illegal_simple_to_compound(self):
+        self.assertRaises(TypeError, deepdiff, self.x, {"b": [1]})
+
+    def test_deepops_diff_illegal_compound_to_simple(self):
+        self.assertRaises(TypeError, deepdiff, {"b": [1]}, self.x)
+
+    def test_deepops_diff_illegal_list_to_set(self):
+        self.assertRaises(TypeError, deepdiff, self.x, {"c": {1}})
 
 
 if __name__ == '__main__':
