@@ -148,6 +148,15 @@ class TestDeepOps(unittest.TestCase):
         deepremoveitems(self.x_list, {})
         self.assertEqual(x_remove_z, self.x_list)
 
+    def test_deepops_illegal_remove_type_simple(self):
+        self.assertRaises(TypeError, deepremoveitems, self.x, {"a": 5})
+
+    def test_deepops_illegal_remove_compound_from_simple(self):
+        self.assertRaises(TypeError, deepremoveitems, self.x, {"a": [1]})
+
+    def test_deepops_illegal_remove_simple_from_compound(self):
+        self.assertRaises(TypeError, deepremoveitems, {"a": [1]}, self.x)
+
     def test_deepops_remove_dict_from_list(self):
         x_remove_z = ["c", "d"]
         deepremoveitems(self.x_list, self.z_dict_from_list)
