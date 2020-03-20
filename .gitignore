@@ -110,3 +110,4 @@ iarbackend/settings/local.py
 
 # PyCharm
 .idea
+.vscode/settings.json
