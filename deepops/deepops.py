@@ -301,8 +301,9 @@ def _deepremoveitems(a, b, path=""):
 
     else:
         raise TypeError(
-                  "deepremoveitems at: %s incompatible or unhandled types: "
-                  "%s and: %s" % (_printable_path(path), type(a), type(b)))
+                  "deepremoveitems at: %s cannot remove from non-compound "
+                  "or otherwise unhandled type: %s"
+                      % (_printable_path(path), type(a)))
 
 
 
