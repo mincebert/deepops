@@ -11,9 +11,6 @@ structures of dictionaries, lists and sets.
 """
 
 
-__version__ = "1.3 (2020-03-20)"
-
-
 
 # --- functions ---
 

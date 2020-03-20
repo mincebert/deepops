@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """A setuptools based setup module.
 See:
 https://packaging.python.org/en/latest/distributing.html
@@ -9,6 +11,8 @@ from setuptools import setup, find_packages
 # To use a consistent encoding
 from codecs import open
 from os import path
+# To get the version number of the module
+import deepops
 
 here = path.abspath(path.dirname(__file__))
 
@@ -18,7 +22,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='deepops',
-    version='1.2',
+    version=deepops.__version__,
     description='Python deepops module',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -49,6 +53,7 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
 
     keywords='deep operations merge remove',
