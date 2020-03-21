@@ -68,6 +68,9 @@ class TestDeepOps(unittest.TestCase):
                                 "q": {"t": [2]}},
                           "e": {8, 9}}
 
+
+    # deepmerge() tests
+
     def test_deepops_merge(self):
         x_merge_y = {"a": "y",
                      "b": 6,
@@ -110,13 +113,22 @@ class TestDeepOps(unittest.TestCase):
         deepmerge(self.x, self.y, list_as_set=False)
         self.assertEqual(x_merge_y, self.x)
 
-    def test_deepops_illegal_merge_original(self):
+    def test_deepops_merge_illegal_original(self):
         self.assertRaises(
             TypeError, deepmerge, self.illegal_x, self.y, list_as_set=True)
 
-    def test_deepops_illegal_merge_from(self):
+    def test_deepops_merge_illegal_from(self):
         self.assertRaises(
             TypeError, deepmerge, self.x, self.illegal_y, list_as_set=True)
+
+    def test_deepops_merge_illegal_compound_from_simple(self):
+        self.assertRaises(TypeError, deepmerge, self.x, {"a": [1]})
+
+    def test_deepops_merge_illegal_simple_from_compound(self):
+        self.assertRaises(TypeError, deepmerge, {"a": [1]}, self.x)
+
+
+    # deepremoveitems() tests
 
     def test_deepops_remove(self):
         x_remove_z = {"c": [],
@@ -148,13 +160,13 @@ class TestDeepOps(unittest.TestCase):
         deepremoveitems(self.x_list, {})
         self.assertEqual(x_remove_z, self.x_list)
 
-    def test_deepops_illegal_remove_type_simple(self):
+    def test_deepops_remove_illegal_type_simple(self):
         self.assertRaises(TypeError, deepremoveitems, self.x, {"a": 5})
 
-    def test_deepops_illegal_remove_compound_from_simple(self):
+    def test_deepops_remove_illegal_compound_from_simple(self):
         self.assertRaises(TypeError, deepremoveitems, self.x, {"a": [1]})
 
-    def test_deepops_illegal_remove_simple_from_compound(self):
+    def test_deepops_remove_illegal_simple_from_compound(self):
         self.assertRaises(TypeError, deepremoveitems, {"a": [1]}, self.x)
 
     def test_deepops_remove_dict_from_list(self):
