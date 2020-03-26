@@ -13,7 +13,7 @@ standard Python "compound" data structures - lists/sets/dictionaries:
   of items to be removed and items to be updated: these could be passed
   to `deepremoveitems()` and `deepmerge()`, respectively, to transform
   one into the other (although note that they would need to be
-  deepcopy()ed first).
+  `deepcopy()`ed first).
 
 The module was developed and used under Python 3.4-3.7 but seems to
 work OK in basic testing under 2.7.
