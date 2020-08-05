@@ -56,7 +56,7 @@ class TestDeepOps(unittest.TestCase):
                           "c": ["x"],
                           "d": {"m": "x",
                                 "n": 3,
-                                "p": [1, 2],
+                                "p": 7,
                                 "q": {"t": [1]}},
                           "e": {7, 8}}
 
@@ -124,7 +124,22 @@ class TestDeepOps(unittest.TestCase):
             TypeError, deepmerge, self.x, self.illegal_y, list_as_set=True)
 
     def test_deepops_merge_illegal_compound_from_simple(self):
-        self.assertRaises(TypeError, deepmerge, self.x, {"a": [1]})
+        self.assertRaises(TypeError, deepmerge, self.x, {"d": {"p": 1}})
+
+    def test_deepops_merge_compound_from_simple_filtered(self):
+        x_merge_const_filtered = {
+            "a": "x",
+            "b": 2,
+            "c": ["x", "y"],
+            "d": {"m": "x",
+                "n": 3,
+                "p": [1, 2],
+                "q": {"t": [1]}},
+            "e": {7, 8}}
+
+        deepmerge(self.x, {"c":["y"], "d": {"p": 1}},
+                  filter_func=lambda p, a, b: not p.startswith(["d", "p"]))
+        self.assertEqual(x_merge_const_filtered, self.x)
 
     def test_deepops_merge_illegal_simple_from_compound(self):
         self.assertRaises(TypeError, deepmerge, {"a": [1]}, self.x)
@@ -167,6 +182,22 @@ class TestDeepOps(unittest.TestCase):
 
     def test_deepops_remove_illegal_compound_from_simple(self):
         self.assertRaises(TypeError, deepremoveitems, self.x, {"a": [1]})
+
+    def test_deepops_remove_compound_from_simple_filtered(self):
+        x_remove_const = {
+            "b": 2,
+            "c": ["x"],
+            "d": {"m": "x",
+                "n": 3,
+                "p": [1, 2],
+                "q": {"t": [1]}},
+            "e": {7, 8}
+        }
+
+        deepremoveitems(
+            self.x, {"a": {}, "d": {"n": [1]}},
+            filter_func=lambda p, a, b: not p.startswith(["d", "n"]))
+        self.assertEqual(x_remove_const, self.x)
 
     def test_deepops_remove_illegal_simple_from_compound(self):
         self.assertRaises(TypeError, deepremoveitems, {"a": [1]}, self.x)
@@ -223,6 +254,27 @@ class TestDeepOps(unittest.TestCase):
 
     def test_deepops_diff_illegal_compound_to_simple(self):
         self.assertRaises(TypeError, deepdiff, {"b": [1]}, self.x)
+
+    def test_deepops_diff_compound_to_simple_filtered(self):
+        x_different = {
+                    "a": "y",
+                    "b": 2,
+                    "c": ["x"],
+                    "d": {"m": "x",
+                          "n": [3],
+                          "p": [2, 3],
+                          "q": {"t": [1]}},
+                    "e": {8, 9}}
+
+        x_diff_const_remove = {"d": {"p": [1, 2]}, "e": {7}}
+        x_diff_const_update = {"a": "y", "d": {"p": [2, 3]}, "e": {9}}
+
+        diff_remove, diff_update = deepdiff(
+            self.x, x_different,
+            filter_func=lambda p, a, b: not p.startswith(["d", "n"]))
+
+        self.assertEqual(x_diff_const_remove, diff_remove)
+        self.assertEqual(x_diff_const_update, diff_update)
 
     def test_deepops_diff_illegal_list_to_set(self):
         self.assertRaises(TypeError, deepdiff, self.x, {"c": {1}})
