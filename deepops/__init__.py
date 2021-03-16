@@ -1,4 +1,4 @@
-__all__ = ['deepmerge', 'deepremoveitems', 'deepdiff']
+__all__ = ['deepmerge', 'deepremoveitems', 'deepdiff', 'deepsetdefault']
 
 __version__ = "1.5"
 
