@@ -6,7 +6,7 @@
 
 import unittest
 
-from deepops import deepmerge, deepremoveitems, deepdiff
+from deepops import deepmerge, deepremoveitems, deepdiff, deepsetdefault
 
 from copy import deepcopy
 
@@ -278,6 +278,53 @@ class TestDeepOps(unittest.TestCase):
 
     def test_deepops_diff_illegal_list_to_set(self):
         self.assertRaises(TypeError, deepdiff, self.x, {"c": {1}})
+
+
+    # deepsetdefault() tests
+
+    def test_deepsetdefault_empty(self):
+        x = {}
+
+        x_default = { 1: { 2: {} } }
+        y_default = {}
+
+        y = deepsetdefault(x, 1, 2)
+
+        self.assertEqual(x, x_default)
+        self.assertEqual(y, y_default)
+
+    def test_deepsetdefault_distinct(self):
+        x = { 1: { 2: {} } }
+
+        x_default = { 1: { 2: {} }, 3: { 4: {} } }
+        y_default = {}
+
+        y = deepsetdefault(x, 3, 4)
+
+        self.assertEqual(x, x_default)
+        self.assertEqual(y, y_default)
+
+    def test_deepsetdefault_existing(self):
+        x = { 1: { 2: { 3: {} } } }
+
+        x_default = { 1: { 2: { 3: {} } } }
+        y_default = { 2: { 3: {} } }
+
+        y = deepsetdefault(x, 1)
+
+        self.assertEqual(x, x_default)
+        self.assertEqual(y, y_default)
+
+    def test_deepsetdefault_last(self):
+        x = { 1: { 2: {} } }
+
+        x_default = { 1: { 2: { 3: [] } } }
+        y_default = []
+
+        y = deepsetdefault(x, 1, 2, 3, last=[])
+
+        self.assertEqual(x, x_default)
+        self.assertEqual(y, y_default)
 
 
 if __name__ == '__main__':
