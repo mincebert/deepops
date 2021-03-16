@@ -12,10 +12,6 @@ structures of dictionaries, lists and sets.
 
 
 
-from copy import copy
-
-
-
 # --- functions ---
 
 
