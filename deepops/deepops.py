@@ -741,13 +741,13 @@ def deepsetdefault(d, *path, last={}):
 
 
 
-def deepget(d, *path):
+def deepget(d, *path, default=None):
     """This function retrieves a value from a nested data structure
     (typically dictionaries), given a path through them, expressed as a
-    list of keys.
+    list of keys given as arguments.
 
-    If the specified path cannot be found, a KeyError exception will be
-    raised.
+    If the specified path cannot be found, the 'default' value is
+    returned.
     """
 
     # path traversed so far (for error message)
@@ -761,7 +761,7 @@ def deepget(d, *path):
 
     for key in path:
         if key not in d_sub:
-            raise KeyError(repr(key) + " at " + repr(path_so_far))
+            return default
 
 
         # move down to the next level in the path
