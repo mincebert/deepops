@@ -1,6 +1,6 @@
 all: deepops
 
-.PHONY: remake deepops upload clean
+.PHONY: remake deepops upload clean tests
 
 
 remake: clean all
@@ -13,3 +13,6 @@ upload:
 
 clean:
 	rm -rf build dist deepops.egg-info
+
+tests:
+	python3 tests/test_deepops.py

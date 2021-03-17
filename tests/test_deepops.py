@@ -6,7 +6,8 @@
 
 import unittest
 
-from deepops import deepmerge, deepremoveitems, deepdiff, deepsetdefault
+from deepops import (
+    deepmerge, deepremoveitems, deepdiff, deepsetdefault, deepget)
 
 from copy import deepcopy
 
@@ -325,6 +326,32 @@ class TestDeepOps(unittest.TestCase):
 
         self.assertEqual(x, x_default)
         self.assertEqual(y, y_default)
+
+
+    # deepget() tests
+
+    def test_deepget_simple(self):
+        x = { 1: { 2: { 3: {} } } }
+
+        x_get = x[1][2]
+
+        y = deepget(x, 1, 2)
+
+        self.assertEqual(y, x_get)
+
+    def test_deepget_none(self):
+        x = { 1: { 2: { 3: {} } } }
+
+        y = deepget(x, 1, 3)
+
+        self.assertEquals(y, None)
+
+    def test_deepget_default(self):
+        x = { 1: { 2: { 3: {} } } }
+
+        y = deepget(x, 1, 3, default=4)
+
+        self.assertEquals(y, 4)
 
 
 if __name__ == '__main__':
