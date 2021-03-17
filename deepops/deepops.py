@@ -734,3 +734,42 @@ def deepsetdefault(d, *path, last={}):
     # return where we got to at the end of the path
 
     return d_sub
+
+
+
+# deepget()
+
+
+
+def deepget(d, *path):
+    """This function retrieves a value from a nested data structure
+    (typically dictionaries), given a path through them, expressed as a
+    list of keys.
+
+    If the specified path cannot be found, a KeyError exception will be
+    raised.
+    """
+
+    # path traversed so far (for error message)
+
+    path_so_far = []
+
+
+    # start at the top of the dictionary
+
+    d_sub = d
+
+    for key in path:
+        if key not in d_sub:
+            raise KeyError(repr(key) + " at " + repr(path_so_far))
+
+
+        # move down to the next level in the path
+
+        d_sub = d_sub[key]
+        path_so_far.append(key)
+
+
+    # return the object at the end of the path
+
+    return d_sub
