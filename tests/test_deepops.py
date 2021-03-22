@@ -344,14 +344,26 @@ class TestDeepOps(unittest.TestCase):
 
         y = deepget(x, 1, 3)
 
-        self.assertEquals(y, None)
+        self.assertEqual(y, None)
 
     def test_deepget_default(self):
         x = { 1: { 2: { 3: {} } } }
 
         y = deepget(x, 1, 3, default=4)
 
-        self.assertEquals(y, 4)
+        self.assertEqual(y, 4)
+
+    def test_deepget_defaulterror_found(self):
+        x = { 1: { 2: { 3: {} } } }
+
+        x_get = { 3: {} }
+
+        self.assertEqual(deepget(x, 1, 2, default_error=True), x_get)
+
+    def test_deepget_defaulterror_notfound(self):
+        x = { 1: { 2: { 3: {} } } }
+
+        self.assertRaises(KeyError, deepget, x, 1, 3, default_error=True)
 
 
 if __name__ == '__main__':
