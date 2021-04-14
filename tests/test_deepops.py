@@ -41,10 +41,12 @@ class TestDeepOps(unittest.TestCase):
         }
 
         # something complex to remove
-        self.z = {"a": {},
-                  "b": {},
-                  "c": {"x": {}},
-                  "t": {"n": {}}}
+        self.z = {
+            "a": {},
+            "b": {},
+            "c": {"x": {}},
+            "t": {"n": {}},
+        }
 
         # a list to remove items from
         self.x_list = ["a", "b", "c", "d"]
@@ -150,7 +152,8 @@ class TestDeepOps(unittest.TestCase):
                 "n": 3,
                 "p": [1, 2],
                 "q": {"t": [1]}},
-            "e": {7, 8}}
+            "e": {7, 8},
+        }
 
         deepmerge(self.x, {"c":["y"], "d": {"p": 1}},
                   filter_func=lambda p, a, b: not p.startswith(["d", "p"]))
@@ -238,12 +241,20 @@ class TestDeepOps(unittest.TestCase):
 
     # deepfilter() tests
 
-    def test_deepops_filter(self):
-        x_filter_z = {
+    def test_deepops_filter_list(self):
+        x_filter_z_list = {
             "a": "x",
             "b": 2
         }
-        self.assertEqual(x_filter_z, deepfilter(self.x, self.z_list))
+        self.assertEqual(x_filter_z_list, deepfilter(self.x, self.z_list))
+
+    def test_deepops_filter_complex(self):
+        x_filter_z = {
+            "a": "x",
+            "b": 2,
+            "c": ["x"],
+        }
+        self.assertEquals(x_filter_z, deepfilter(self.x, self.z))
 
 
     # deepdiff() tests

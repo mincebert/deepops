@@ -491,17 +491,17 @@ def _deepfilter(a, b, path=DeepPath()):
 
         else:
             r = []
-            for item in b:
-                if not b[item]:
-                    if item in a:
-                        r[item] = a[item]
+            for item in a:
+                if item in b:
+                    if not b[item]:
+                        r.append(item)
 
-                else:
-                    raise ValueError(
-                              "deepfilter at: %s cannot filter non-"
-                              "empty dictionary item from non-"
-                              "dictionary type: %s"
-                                  % (path.sub(item), type(a)))
+                    else:
+                        raise ValueError(
+                                "deepfilter at: %s cannot filter non-"
+                                "empty dictionary item from non-"
+                                "dictionary type: %s"
+                                    % (path.sub(item), type(a)))
 
 
         # we did all the work above, building a list (to preserve
