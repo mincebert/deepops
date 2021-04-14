@@ -326,7 +326,41 @@ class TestDeepOps(unittest.TestCase):
             "e": {8},
         }
 
-        self.assertEquals(x_filter_result, deepfilter(self.x, x_filter))
+        self.assertEqual(x_filter_result, deepfilter(self.x, x_filter))
+
+    def test_deepops_illegal_dict_from_list(self):
+        x_filter = {
+            "d": {
+                "p": {
+                    1: ["list"]
+                }
+            }
+        }
+
+        self.assertRaises(ValueError, deepfilter, self.x, x_filter)
+
+    def test_deepops_simple_from_dict(self):
+        x_filter = {
+            "d": {
+                "q": {
+                    "t": 5
+                }
+            }
+        }
+
+        self.assertRaises(TypeError, deepfilter, self.x, x_filter)
+
+    def test_deepops_dict_from_simple(self):
+        x_filter = {
+            "d": {
+                "m": {
+                    "simple": []
+                }
+            }
+        }
+
+        self.assertRaises(TypeError, deepfilter, self.x, x_filter)
+
 
     # deepdiff() tests
 
