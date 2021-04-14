@@ -21,10 +21,14 @@ class TestDeepOps(unittest.TestCase):
             "a": "x",
             "b": 2,
             "c": ["x"],
-            "d": {"m": "x",
+            "d": {
+                "m": "x",
                 "n": 3,
                 "p": [1, 2],
-                "q": {"t": [1]}},
+                "q": {
+                    "t": [1],
+                },
+            },
             "e": {7, 8},
         }
 
@@ -33,10 +37,14 @@ class TestDeepOps(unittest.TestCase):
             "a": "y",
             "b": 6,
             "c": ["y", "x"],
-            "d": {"m": "y",
+            "d": {
+                "m": "y",
                 "o": 4,
                 "p": [2, 3],
-                "q": {"t": [2]}},
+                "q": {
+                    "t": [2],
+                },
+            },
             "e": {8, 9},
         }
 
@@ -44,8 +52,12 @@ class TestDeepOps(unittest.TestCase):
         self.z = {
             "a": {},
             "b": {},
-            "c": {"x": {}},
-            "t": {"n": {}},
+            "c": {
+                "x": {},
+            },
+            "t": {
+                "n": {},
+            },
         }
 
         # a list to remove items from
@@ -62,11 +74,15 @@ class TestDeepOps(unittest.TestCase):
             "a": "x",
             "b": ["y", "z"],
             "c": ["x"],
-            "d": {"m": "x",
+            "d": {
+                "m": "x",
                 "n": 3,
                 "p": 7,
-                "q": {"t": [1]}},
-            "e": {7, 8},
+                "q": {
+                    "t": [1],
+                },
+            },
+            "e": { 7, 8 },
         }
 
         # something to illegal to merge into x
@@ -74,10 +90,14 @@ class TestDeepOps(unittest.TestCase):
             "a": "y",
             "b": ["y", "z"],
             "c": ["y", "x"],
-            "d": {"m": "y",
+            "d": {
+                "m": "y",
                 "o": 4,
                 "p": [2, 3],
-                "q": {"t": [2]}},
+                "q": {
+                    "t": [2],
+                },
+            },
             "e": {8, 9},
         }
 
@@ -89,11 +109,15 @@ class TestDeepOps(unittest.TestCase):
             "a": "y",
             "b": 6,
             "c": ["x", "y"],
-            "d": {"m": "y",
+            "d": {
+                "m": "y",
                 "n": 3,
                 "p": [1, 2, 3],
-                "q": {"t": [1, 2]},
-                "o": 4},
+                "q": {
+                    "t": [1, 2]
+                },
+                "o": 4,
+            },
             "e": {8, 9, 7},
         }
 
@@ -105,11 +129,15 @@ class TestDeepOps(unittest.TestCase):
             "a": "x",
             "b": 2,
             "c": ["x", "y"],
-            "d": {"m": "x",
+            "d": {
+                "m": "x",
                 "n": 3,
                 "p": [1, 2, 3],
-                "q": {"t": [1, 2]},
-                "o": 4},
+                "q": {
+                    "t": [1, 2],
+                },
+                "o": 4,
+            },
             "e": {8, 9, 7},
         }
 
@@ -121,11 +149,15 @@ class TestDeepOps(unittest.TestCase):
             "a": "y",
             "b": 6,
             "c": ["x", "y", 'x'],
-            "d": {"m": "y",
+            "d": {
+                "m": "y",
                 "n": 3,
                 "p": [1, 2, 2, 3],
-                "q": {"t": [1, 2]},
-                "o": 4},
+                "q": {
+                    "t": [1, 2]
+                },
+                "o": 4,
+            },
             "e": {8, 9, 7},
         }
 
@@ -148,10 +180,14 @@ class TestDeepOps(unittest.TestCase):
             "a": "x",
             "b": 2,
             "c": ["x", "y"],
-            "d": {"m": "x",
+            "d": {
+                "m": "x",
                 "n": 3,
                 "p": [1, 2],
-                "q": {"t": [1]}},
+                "q": {
+                    "t": [1],
+                }
+            },
             "e": {7, 8},
         }
 
@@ -168,10 +204,14 @@ class TestDeepOps(unittest.TestCase):
     def test_deepops_remove(self):
         x_remove_z = {
             "c": [],
-            "d": {"m": "x",
+            "d": {
+                "m": "x",
                 "n": 3,
                 "p": [1, 2],
-                "q": {"t": [1]}},
+                "q": {
+                    "t": [1],
+                },
+            },
             "e": {8, 7},
         }
 
@@ -210,8 +250,11 @@ class TestDeepOps(unittest.TestCase):
             "d": {"m": "x",
                 "n": 3,
                 "p": [1, 2],
-                "q": {"t": [1]}},
-            "e": {7, 8}
+                "q": {
+                    "t": [1],
+                },
+            },
+            "e": {7, 8},
         }
         deepremoveitems(
             self.x, {"a": {}, "d": {"n": [1]}},
@@ -232,7 +275,10 @@ class TestDeepOps(unittest.TestCase):
             "d": {"m": "x",
                 "n": 3,
                 "p": [1, 2],
-                "q": {"t": [1]}},
+                "q": {
+                    "t": [1],
+                },
+            },
             "e": {7, 8},
         }
         deepremoveitems(self.x, self.z_list)
@@ -256,15 +302,44 @@ class TestDeepOps(unittest.TestCase):
         }
         self.assertEquals(x_filter_z, deepfilter(self.x, self.z))
 
+    def test_deepops_filter_complex(self):
+        x_filter = {
+            "a": {},
+            "d": {
+                "n": {},
+                "q": {
+                    "s": {},
+                    "t": {},
+                },
+            },
+            "e": [8, 9],
+        }
+
+        x_filter_result = {
+            "a": "x",
+            "d": {
+                "n": 3,
+                "q": {
+                    "t": [1],
+                },
+            },
+            "e": {8},
+        }
+
+        self.assertEquals(x_filter_result, deepfilter(self.x, x_filter))
 
     # deepdiff() tests
 
     def test_deepops_diff_complex(self):
         x_diff_y_remove = {
             "c": ['x'],
-            "d": {"n": None,
-                    "p": [1, 2],
-                    "q": {"t": [1]}},
+            "d": {
+                "n": None,
+                "p": [1, 2],
+                "q": {
+                    "t": [1],
+                },
+            },
             "e": {7},
         }
 
@@ -272,10 +347,14 @@ class TestDeepOps(unittest.TestCase):
             "a": "y",
             "b": 6,
             "c": ["y", "x"],
-            "d": {"m": "y",
-                    "o": 4,
-                    "p": [2, 3],
-                    "q": {"t": [2]}},
+            "d": {
+                "m": "y",
+                "o": 4,
+                "p": [2, 3],
+                "q": {
+                    "t": [2],
+                },
+            },
             "e": {9},
         }
 
@@ -303,10 +382,14 @@ class TestDeepOps(unittest.TestCase):
             "a": "y",
             "b": 2,
             "c": ["x"],
-            "d": {"m": "x",
-                    "n": [3],
-                    "p": [2, 3],
-                    "q": {"t": [1]}},
+            "d": {
+                "m": "x",
+                "n": [3],
+                "p": [2, 3],
+                "q": {
+                    "t": [1],
+                },
+            },
             "e": {8, 9},
         }
 
