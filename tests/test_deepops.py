@@ -7,7 +7,7 @@
 import unittest
 
 from deepops import (
-    deepmerge, deepremoveitems, deepdiff, deepsetdefault, deepget)
+    deepmerge, deepremoveitems, deepfilter, deepdiff, deepsetdefault, deepget)
 
 from copy import deepcopy
 
@@ -17,24 +17,28 @@ class TestDeepOps(unittest.TestCase):
 
     def setUp(self):
         # something complex to merge into
-        self.x = {"a": "x",
-                  "b": 2,
-                  "c": ["x"],
-                  "d": {"m": "x",
-                        "n": 3,
-                        "p": [1, 2],
-                        "q": {"t": [1]}},
-                  "e": {7, 8}}
+        self.x = {
+            "a": "x",
+            "b": 2,
+            "c": ["x"],
+            "d": {"m": "x",
+                "n": 3,
+                "p": [1, 2],
+                "q": {"t": [1]}},
+            "e": {7, 8},
+        }
 
         # something to complex to merge into above
-        self.y = {"a": "y",
-                  "b": 6,
-                  "c": ["y", "x"],
-                  "d": {"m": "y",
-                        "o": 4,
-                        "p": [2, 3],
-                        "q": {"t": [2]}},
-                  "e": {8, 9}}
+        self.y = {
+            "a": "y",
+            "b": 6,
+            "c": ["y", "x"],
+            "d": {"m": "y",
+                "o": 4,
+                "p": [2, 3],
+                "q": {"t": [2]}},
+            "e": {8, 9},
+        }
 
         # something complex to remove
         self.z = {"a": {},
@@ -52,66 +56,76 @@ class TestDeepOps(unittest.TestCase):
         self.z_dict_from_list = {"a": None, "b": None, "n": None}
 
         # something illegal to merge into
-        self.illegal_x = {"a": "x",
-                          "b": ["y", "z"],
-                          "c": ["x"],
-                          "d": {"m": "x",
-                                "n": 3,
-                                "p": 7,
-                                "q": {"t": [1]}},
-                          "e": {7, 8}}
+        self.illegal_x = {
+            "a": "x",
+            "b": ["y", "z"],
+            "c": ["x"],
+            "d": {"m": "x",
+                "n": 3,
+                "p": 7,
+                "q": {"t": [1]}},
+            "e": {7, 8},
+        }
 
         # something to illegal to merge into x
-        self.illegal_y = {"a": "y",
-                          "b": ["y", "z"],
-                          "c": ["y", "x"],
-                          "d": {"m": "y",
-                                "o": 4,
-                                "p": [2, 3],
-                                "q": {"t": [2]}},
-                          "e": {8, 9}}
+        self.illegal_y = {
+            "a": "y",
+            "b": ["y", "z"],
+            "c": ["y", "x"],
+            "d": {"m": "y",
+                "o": 4,
+                "p": [2, 3],
+                "q": {"t": [2]}},
+            "e": {8, 9},
+        }
 
 
     # deepmerge() tests
 
     def test_deepops_merge(self):
-        x_merge_y = {"a": "y",
-                     "b": 6,
-                     "c": ["x", "y"],
-                     "d": {"m": "y",
-                           "n": 3,
-                           "p": [1, 2, 3],
-                           "q": {"t": [1, 2]},
-                           "o": 4},
-                     "e": {8, 9, 7}}
+        x_merge_y = {
+            "a": "y",
+            "b": 6,
+            "c": ["x", "y"],
+            "d": {"m": "y",
+                "n": 3,
+                "p": [1, 2, 3],
+                "q": {"t": [1, 2]},
+                "o": 4},
+            "e": {8, 9, 7},
+        }
 
         deepmerge(self.x, self.y, list_as_set=True)
         self.assertEqual(x_merge_y, self.x)
 
     def test_deepops_merge_no_replace(self):
-        x_merge_y = {"a": "x",
-                     "b": 2,
-                     "c": ["x", "y"],
-                     "d": {"m": "x",
-                           "n": 3,
-                           "p": [1, 2, 3],
-                           "q": {"t": [1, 2]},
-                           "o": 4},
-                     "e": {8, 9, 7}}
+        x_merge_y = {
+            "a": "x",
+            "b": 2,
+            "c": ["x", "y"],
+            "d": {"m": "x",
+                "n": 3,
+                "p": [1, 2, 3],
+                "q": {"t": [1, 2]},
+                "o": 4},
+            "e": {8, 9, 7},
+        }
 
         deepmerge(self.x, self.y, replace=False, list_as_set=True)
         self.assertEqual(x_merge_y, self.x)
 
     def test_deepops_merge_no_set(self):
-        x_merge_y = {"a": "y",
-                     "b": 6,
-                     "c": ["x", "y", 'x'],
-                     "d": {"m": "y",
-                           "n": 3,
-                           "p": [1, 2, 2, 3],
-                           "q": {"t": [1, 2]},
-                           "o": 4},
-                     "e": {8, 9, 7}}
+        x_merge_y = {
+            "a": "y",
+            "b": 6,
+            "c": ["x", "y", 'x'],
+            "d": {"m": "y",
+                "n": 3,
+                "p": [1, 2, 2, 3],
+                "q": {"t": [1, 2]},
+                "o": 4},
+            "e": {8, 9, 7},
+        }
 
         deepmerge(self.x, self.y, list_as_set=False)
         self.assertEqual(x_merge_y, self.x)
@@ -149,12 +163,14 @@ class TestDeepOps(unittest.TestCase):
     # deepremoveitems() tests
 
     def test_deepops_remove(self):
-        x_remove_z = {"c": [],
-                      "d": {"m": "x",
-                            "n": 3,
-                            "p": [1, 2],
-                            "q": {"t": [1]}},
-                      "e": {8, 7}}
+        x_remove_z = {
+            "c": [],
+            "d": {"m": "x",
+                "n": 3,
+                "p": [1, 2],
+                "q": {"t": [1]}},
+            "e": {8, 7},
+        }
 
         deepremoveitems(self.x, self.z)
         self.assertEqual(x_remove_z, self.x)
@@ -194,7 +210,6 @@ class TestDeepOps(unittest.TestCase):
                 "q": {"t": [1]}},
             "e": {7, 8}
         }
-
         deepremoveitems(
             self.x, {"a": {}, "d": {"n": [1]}},
             filter_func=lambda p, a, b: not p.startswith(["d", "n"]))
@@ -209,33 +224,49 @@ class TestDeepOps(unittest.TestCase):
         self.assertEqual(x_remove_z, self.x_list)
 
     def test_deepops_remove_list_from_dict(self):
-        x_remove_z = {"c": ["x"],
-                      "d": {"m": "x",
-                            "n": 3,
-                            "p": [1, 2],
-                            "q": {"t": [1]}},
-                      "e": {7, 8}}
+        x_remove_z = {
+            "c": ["x"],
+            "d": {"m": "x",
+                "n": 3,
+                "p": [1, 2],
+                "q": {"t": [1]}},
+            "e": {7, 8},
+        }
         deepremoveitems(self.x, self.z_list)
         self.assertEqual(x_remove_z, self.x)
+
+
+    # deepfilter() tests
+
+    def test_deepops_filter(self):
+        x_filter_z = {
+            "a": "x",
+            "b": 2
+        }
+        self.assertEqual(x_filter_z, deepfilter(self.x, self.z_list))
 
 
     # deepdiff() tests
 
     def test_deepops_diff_complex(self):
-        x_diff_y_remove = {"c": ['x'],
-                           "d": {"n": None,
-                                 "p": [1, 2],
-                                 "q": {"t": [1]}},
-                           "e": {7}}
+        x_diff_y_remove = {
+            "c": ['x'],
+            "d": {"n": None,
+                    "p": [1, 2],
+                    "q": {"t": [1]}},
+            "e": {7},
+        }
 
-        x_diff_y_update = {"a": "y",
-                           "b": 6,
-                           "c": ["y", "x"],
-                           "d": {"m": "y",
-                                 "o": 4,
-                                 "p": [2, 3],
-                                 "q": {"t": [2]}},
-                           "e": {9}}
+        x_diff_y_update = {
+            "a": "y",
+            "b": 6,
+            "c": ["y", "x"],
+            "d": {"m": "y",
+                    "o": 4,
+                    "p": [2, 3],
+                    "q": {"t": [2]}},
+            "e": {9},
+        }
 
         diff_remove, diff_update = deepdiff(self.x, self.y)
         self.assertEqual(x_diff_y_remove, diff_remove)
@@ -258,14 +289,15 @@ class TestDeepOps(unittest.TestCase):
 
     def test_deepops_diff_compound_to_simple_filtered(self):
         x_different = {
-                    "a": "y",
-                    "b": 2,
-                    "c": ["x"],
-                    "d": {"m": "x",
-                          "n": [3],
-                          "p": [2, 3],
-                          "q": {"t": [1]}},
-                    "e": {8, 9}}
+            "a": "y",
+            "b": 2,
+            "c": ["x"],
+            "d": {"m": "x",
+                    "n": [3],
+                    "p": [2, 3],
+                    "q": {"t": [1]}},
+            "e": {8, 9},
+        }
 
         x_diff_const_remove = {"d": {"p": [1, 2]}, "e": {7}}
         x_diff_const_update = {"a": "y", "d": {"p": [2, 3]}, "e": {9}}
