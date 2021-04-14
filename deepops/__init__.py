@@ -1,6 +1,7 @@
 __all__ = [
-    'deepmerge', 'deepremoveitems', 'deepdiff', 'deepsetdefault', 'deepget']
+    'deepmerge', 'deepremoveitems', 'deepfilter', 'deepdiff', 'deepsetdefault',
+    'deepget']
 
-__version__ = "1.6.2"
+__version__ = "1.7"
 
 from deepops.deepops import *
