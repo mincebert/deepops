@@ -492,38 +492,34 @@ class TestDeepOps(unittest.TestCase):
 
     def test_deepget_simple(self):
         x = { 1: { 2: { 3: {} } } }
-
         x_get = x[1][2]
-
-        y = deepget(x, 1, 2)
-
-        self.assertEqual(y, x_get)
+        self.assertEqual(deepget(x, 1, 2), x_get)
 
     def test_deepget_none(self):
         x = { 1: { 2: { 3: {} } } }
-
         y = deepget(x, 1, 3)
-
         self.assertEqual(y, None)
 
-    def test_deepget_default(self):
+    def test_deepget_default_keyerror(self):
         x = { 1: { 2: { 3: {} } } }
+        self.assertEqual(deepget(x, 1, 3, default=4), 4)
 
-        y = deepget(x, 1, 3, default=4)
-
-        self.assertEqual(y, 4)
+    def test_deepget_default_typeerror(self):
+        x = { 1: { 2: "string" } }
+        self.assertEqual(deepget(x, 1, 2, 3, default=4), 4)
 
     def test_deepget_defaulterror_found(self):
         x = { 1: { 2: { 3: {} } } }
-
         x_get = { 3: {} }
-
         self.assertEqual(deepget(x, 1, 2, default_error=True), x_get)
 
-    def test_deepget_defaulterror_notfound(self):
+    def test_deepget_defaulterror_keyerror(self):
         x = { 1: { 2: { 3: {} } } }
-
         self.assertRaises(KeyError, deepget, x, 1, 3, default_error=True)
+
+    def test_deepget_defaulterror_typeerror(self):
+        x = { 1: { 2: "string" } }
+        self.assertRaises(TypeError, deepget, x, 1, 2, 3, default_error=True)
 
 
 if __name__ == '__main__':
