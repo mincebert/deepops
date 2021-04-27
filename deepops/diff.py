@@ -48,14 +48,15 @@ def _deepdiff(a, b, list_as_set, change_types, filter_func, path=DeepPath()):
     if isinstance(a, list) and isinstance(b, list):
         if list_as_set:
             # we're treating lists as sets, so we find the differences,
-            # ignoring the order
+            # ignoring the order - we create the new objects with the
+            # same type as 'a' (in case it's not a list)
 
             return (
                 # remove everything in 'a' that is not in 'b'
-                [ i for i in a if i not in b ],
+                type(a)([ i for i in a if i not in b ]),
 
                 # update (add) everything in 'b' that is not in 'a'
-                [ i for i in b if i not in a ])
+                type(a)([ i for i in b if i not in a ]))
 
         else:
             # with lists as lists, the order is important and they're
@@ -80,8 +81,10 @@ def _deepdiff(a, b, list_as_set, change_types, filter_func, path=DeepPath()):
         #
         # this also initialises the remove_items dictionary (perhaps to
         # an empty dictionary, if there are none)
+        #
+        # we create this with the same type as 'a'
 
-        remove_items = { i: None for i in a if i not in b }
+        remove_items = type(a)({ i: None for i in a if i not in b })
 
 
         # we add all the items where the key is in 'b' but not in 'a',
@@ -89,8 +92,11 @@ def _deepdiff(a, b, list_as_set, change_types, filter_func, path=DeepPath()):
         #
         # this also initialises the update_items dictionary (perhaps to
         # an empty dictionary, if there are none)
+        #
+        # we create this with the same type as 'a' (not 'b'), as we're
+        # really reporting on what needs to be added to 'a'
 
-        update_items = { i: b[i] for i in b if i not in a }
+        update_items = type(a)({ i: b[i] for i in b if i not in a })
 
 
         # finally, work through the keys that are common to both

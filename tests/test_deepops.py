@@ -388,6 +388,60 @@ class TestDeepOps(unittest.TestCase):
         self.assertRaises(TypeError, deepfilter, self.x, x_filter)
 
 
+    def test_filter_subclasses(self):
+        """Tests subclasses of primary object types, to check they're
+        being cloned correctly in the result.
+        """
+
+        class SubDict(dict):
+            pass
+
+        class SubList(list):
+            pass
+
+        class SubSet(list):
+            pass
+
+        sub_x = SubDict({
+            "a": "x",
+            "b": 2,
+            "c": SubList(["x"]),
+            "d": SubDict({
+                "m": "x",
+                "n": 3,
+                "p": SubList([1, 2]),
+                "q": SubDict({
+                    "t": SubList([1]),
+                }),
+            }),
+            "e": SubSet({7, 8}),
+        })
+
+        filter_x = SubDict({
+            "a": None,
+            "b": None,
+            "c": SubList(["x"]),
+            "d": SubDict({
+                "m": None,
+                "n": None,
+                "p": None,
+                "q": SubDict({
+                    "t": None,
+                }),
+            }),
+            "e": None,
+        })
+
+        filtered_x = deepfilter(sub_x, filter_x)
+
+        self.assertIs(type(filtered_x), SubDict)
+        self.assertIs(type(filtered_x["c"]), SubList)
+        self.assertIs(type(filtered_x["d"]), SubDict)
+        self.assertIs(type(filtered_x["d"]["q"]), SubDict)
+        self.assertIs(type(filtered_x["d"]["q"]["t"]), SubList)
+        self.assertIs(type(filtered_x["e"]), SubSet)
+
+
     # deepdiff() tests
 
 
@@ -474,6 +528,56 @@ class TestDeepOps(unittest.TestCase):
         self.assertRaises(TypeError, deepdiff, self.x, {"c": {1}})
 
 
+    def test_diff_subclasses(self):
+        """Tests subclasses of primary object types, to check they're
+        being cloned correctly in the result.
+        """
+
+        class SubDict(dict):
+            pass
+
+        class SubList(list):
+            pass
+
+        class SubSet(list):
+            pass
+
+        sub_a = SubDict({
+            "a": SubList(["x", "y", "z"]),
+            "b": SubSet({1, 2, 3}),
+            "d": SubDict({
+                "m": "x",
+                "n": 3,
+                "p": SubList([1, 2]),
+                "q": SubDict({
+                    "t": SubList([1]),
+                }),
+            }),
+        })
+
+        sub_b = SubDict({
+            "a": ["y"],
+            "b": SubSet({2, 4}),
+            "d": SubDict({
+                "b": None,
+            }),
+            "e": None,
+            "l": SubList(["x"]),
+            "s": SubSet({1}),
+            "t": SubDict({ 1: 2, 3: 4 }),
+        })
+
+        sub_remove, sub_update = deepdiff(sub_a, sub_b, list_as_set=True)
+
+        self.assertIs(type(sub_remove), SubDict)
+        self.assertIs(type(sub_update), SubDict)
+
+        self.assertIs(type(sub_remove["b"]), SubSet)
+        self.assertIs(type(sub_update["l"]), SubList)
+        self.assertIs(type(sub_update["s"]), SubSet)
+        self.assertIs(type(sub_update["t"]), SubDict)
+
+
     # deepsetdefault() tests
 
 
@@ -523,6 +627,15 @@ class TestDeepOps(unittest.TestCase):
 
         self.assertEqual(x, x_default)
         self.assertEqual(y, y_default)
+
+
+    def test_setdefault_subclass(self):
+        class SubDict(dict):
+            pass
+
+        d = {}
+        deepsetdefault(d, 1, 2, last=SubDict())
+        self.assertIs(type(d[1][2]), SubDict)
 
 
     # deepget() tests

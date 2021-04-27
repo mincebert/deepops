@@ -2,6 +2,10 @@
 
 
 
+from copy import copy
+
+
+
 def deepsetdefault(d, *path, last={}):
     """This function performs a path of dict.setdefault() calls to
     initialise multiple levels of a dictionary 'd' with a number of path
@@ -34,7 +38,7 @@ def deepsetdefault(d, *path, last={}):
         # all defaults (if it was the default argument)
 
         d_sub = d_sub.setdefault(
-            key, {} if path_remain > 1 else last.copy())
+            key, {} if path_remain > 1 else copy(last))
 
 
         path_remain -= 1

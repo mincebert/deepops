@@ -65,17 +65,20 @@ def _deepfilter(a, b, path=DeepPath()):
 
 
         # we did all the work above, building a list (to preserve
-        # duplicates and order) - but, if the source type was a set,
-        # convert it here, else it's a list, so return it directly
+        # duplicates and order) - but we actually want an object of the
+        # same type as 'a' (which might be a set, or a subclass), so
+        # convert it, if necessary
 
-        if isinstance(a, set):
-            r = set(r)
+        r = type(a)(r)
 
 
     # if the object we're filtering is a dictionary...
 
     elif isinstance(a, dict):
-        r = {}
+        # return value is object of same type
+
+        r = type(a)()
+
 
         # ... and the object specifying what to filter is a list or set,
         # we just include the keys in that list or set, if they exist
