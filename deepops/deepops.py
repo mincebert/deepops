@@ -760,8 +760,8 @@ def _deepdiff(a, b, list_as_set, change_types, filter_func, path=DeepPath()):
 
                 if (type(a[item]) != type(b[item])) and (not change_types):
                     raise TypeError(
-                              "deepmerge at: %s cannot compare or change "
-                              "types: %s and: %s"
+                              "deepdiff at: %s cannot compare or "
+                              "change types: %s and: %s"
                                   % (path.sub(item), type(a[item]),
                                      type(b[item])))
 
