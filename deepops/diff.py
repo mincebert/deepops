@@ -192,16 +192,16 @@ def deepdiff(a, b, list_as_set=False, change_types=False, filter_func=None):
     (i.e. items that are in 'b' that are not in 'a', or items where the
     value in 'b' is different from 'a').
 
-    Calling 'deepremoveitems(a, remove_items)' followed by
-    'deepmerge(a, update_items)' should result in 'a' being equal to
-    'b' by value.  See those functions for more information.
+    Calling deepremoveitems(a, remove_items) followed by deepmerge(a,
+    update_items) should result in 'a' being equal to 'b' by value.
+    See those functions for more information.
 
     Note, however, the items to be removed/updated are not copied
     before being returned so will be the same object from 'a' or 'b'.
     This may cause trouble if they're modified or passed directly to
-    deepremoveitems() or deepmerge() as it will break the interation
+    deepremoveitems() or deepmerge() as it will break the iteration
     process, as the same object will be iterated over twice,
-    simultaneously.  To do this, they shoould be copy.deepcopy()ed
+    simultaneously.  To do this, they should be copy.deepcopy()ed
     first (or similar).
 
     The behaviour of this function depends on the type of object being
@@ -242,7 +242,9 @@ def deepdiff(a, b, list_as_set=False, change_types=False, filter_func=None):
     one simple type to another (for example, a string replacing an
     integer); if this is False and a difference is encountered, a
     TypeError will be raised.  This will not change between compound
-    types (for example a list changing to a set).
+    types (for example a list changing to a set).  Note that 'None' is
+    not treated specially so, if change_types will need to set to True
+    to change between a simple type and None or vice-versa.
 
     filter_func -- if this is specified, it is a function which is
     called upon each recursion, receiving the parameters (path [a
