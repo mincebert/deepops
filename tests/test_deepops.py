@@ -169,17 +169,18 @@ class TestDeepOps(unittest.TestCase):
 
 
     def test_merge_illegal_original(self):
-        self.assertRaises(
-            TypeError, deepmerge, self.illegal_x, self.y, list_as_set=True)
+        with self.assertRaises(TypeError):
+            deepmerge(self.illegal_x, self.y, list_as_set=True)
 
 
     def test_merge_illegal_from(self):
-        self.assertRaises(
-            TypeError, deepmerge, self.x, self.illegal_y, list_as_set=True)
+        with self.assertRaises(TypeError):
+            deepmerge(self.x, self.illegal_y, list_as_set=True)
 
 
     def test_merge_illegal_compound_from_simple(self):
-        self.assertRaises(TypeError, deepmerge, self.x, {"d": {"p": 1}})
+        with self.assertRaises(TypeError):
+            deepmerge(self.x, {"d": {"p": 1}})
 
 
     def test_merge_compound_from_simple_filtered(self):
@@ -204,7 +205,8 @@ class TestDeepOps(unittest.TestCase):
 
 
     def test_merge_illegal_simple_from_compound(self):
-        self.assertRaises(TypeError, deepmerge, {"a": [1]}, self.x)
+        with self.assertRaises(TypeError):
+            deepmerge({"a": [1]}, self.x)
 
 
     # deepremoveitems() tests
@@ -235,15 +237,18 @@ class TestDeepOps(unittest.TestCase):
 
 
     def test_remove_illegal(self):
-        self.assertRaises(TypeError, deepremoveitems, "a", self.z)
+        with self.assertRaises(TypeError):
+            deepremoveitems("a", self.z)
 
 
     def test_remove_illegal_from(self):
-        self.assertRaises(TypeError, deepremoveitems, self.x, "a")
+        with self.assertRaises(TypeError):
+            deepremoveitems(self.x, "a")
 
 
     def test_remove_illegal_from_list(self):
-        self.assertRaises(ValueError, deepremoveitems, self.x_list, self.z)
+        with self.assertRaises(ValueError):
+            deepremoveitems(self.x_list, self.z)
 
 
     def test_remove_empty_dict_from_list(self):
@@ -253,11 +258,13 @@ class TestDeepOps(unittest.TestCase):
 
 
     def test_remove_illegal_type_simple(self):
-        self.assertRaises(TypeError, deepremoveitems, self.x, {"a": 5})
+        with self.assertRaises(TypeError):
+            deepremoveitems(self.x, {"a": 5})
 
 
     def test_remove_illegal_compound_from_simple(self):
-        self.assertRaises(TypeError, deepremoveitems, self.x, {"a": [1]})
+        with self.assertRaises(TypeError):
+            deepremoveitems(self.x, {"a": [1]})
 
 
     def test_remove_compound_from_simple_filtered(self):
@@ -280,7 +287,8 @@ class TestDeepOps(unittest.TestCase):
 
 
     def test_remove_illegal_simple_from_compound(self):
-        self.assertRaises(TypeError, deepremoveitems, {"a": [1]}, self.x)
+        with self.assertRaises(TypeError):
+            deepremoveitems({"a": [1]}, self.x)
 
 
     def test_remove_dict_from_list(self):
@@ -361,7 +369,8 @@ class TestDeepOps(unittest.TestCase):
             }
         }
 
-        self.assertRaises(ValueError, deepfilter, self.x, x_filter)
+        with self.assertRaises(ValueError):
+            deepfilter(self.x, x_filter)
 
 
     def test_filter_simple_from_dict(self):
@@ -373,7 +382,8 @@ class TestDeepOps(unittest.TestCase):
             }
         }
 
-        self.assertRaises(TypeError, deepfilter, self.x, x_filter)
+        with self.assertRaises(TypeError):
+            deepfilter(self.x, x_filter)
 
 
     def test_filter_dict_from_simple(self):
@@ -385,7 +395,8 @@ class TestDeepOps(unittest.TestCase):
             }
         }
 
-        self.assertRaises(TypeError, deepfilter, self.x, x_filter)
+        with self.assertRaises(TypeError):
+            deepfilter(self.x, x_filter)
 
 
     def test_filter_subclasses(self):
@@ -486,15 +497,18 @@ class TestDeepOps(unittest.TestCase):
 
 
     def test_diff_illegal_type(self):
-        self.assertRaises(TypeError, deepdiff, self.x, {"a": 1})
+        with self.assertRaises(TypeError):
+            deepdiff(self.x, {"a": 1})
 
 
     def test_diff_illegal_simple_to_compound(self):
-        self.assertRaises(TypeError, deepdiff, self.x, {"b": [1]})
+        with self.assertRaises(TypeError):
+            deepdiff(self.x, {"b": [1]})
 
 
     def test_diff_illegal_compound_to_simple(self):
-        self.assertRaises(TypeError, deepdiff, {"b": [1]}, self.x)
+        with self.assertRaises(TypeError):
+            deepdiff({"b": [1]}, self.x)
 
 
     def test_diff_compound_to_simple_filtered(self):
@@ -525,7 +539,8 @@ class TestDeepOps(unittest.TestCase):
 
 
     def test_diff_illegal_list_to_set(self):
-        self.assertRaises(TypeError, deepdiff, self.x, {"c": {1}})
+        with self.assertRaises(TypeError):
+            deepdiff(self.x, {"c": {1}})
 
 
     def test_diff_subclasses(self):
@@ -671,12 +686,14 @@ class TestDeepOps(unittest.TestCase):
 
     def test_get_defaulterror_keyerror(self):
         x = { 1: { 2: { 3: {} } } }
-        self.assertRaises(KeyError, deepget, x, 1, 3, default_error=True)
+        with self.assertRaises(KeyError):
+            deepget(x, 1, 3, default_error=True)
 
 
     def test_get_defaulterror_typeerror(self):
         x = { 1: { 2: "string" } }
-        self.assertRaises(TypeError, deepget, x, 1, 2, 3, default_error=True)
+        with self.assertRaises(TypeError):
+            deepget(x, 1, 2, 3, default_error=True)
 
 
 if __name__ == '__main__':
