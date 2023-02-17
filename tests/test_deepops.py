@@ -456,6 +456,33 @@ class TestDeepOps(unittest.TestCase):
     # deepdiff() tests
 
 
+    def test_diff_equal_complex(self):
+        remove, update = deepdiff(self.x, self.x)
+        self.assertEqual(type(self.x)(), remove)
+        self.assertEqual(type(self.x)(), update)
+
+
+    def test_diff_equal_list(self):
+        list_ = [1, 2, { 11: "a", 12: "b" }]
+        remove, update = deepdiff(list_, list_)
+        self.assertEqual(list(), remove)
+        self.assertEqual(list(), update)
+
+
+    def test_diff_equal_set(self):
+        set_ = { 1, 2, 3 }
+        remove, update = deepdiff(set_, set_)
+        self.assertEqual(set(), remove)
+        self.assertEqual(set(), update)
+
+
+    def test_diff_equal_dict(self):
+        dict_ = { 1: "a", 2: [], 3: { 11, 12 } }
+        remove, update = deepdiff(dict_, dict_)
+        self.assertEqual(dict(), remove)
+        self.assertEqual(dict(), update)
+
+
     def test_diff_complex(self):
         x_diff_y_remove = {
             "c": ['x'],

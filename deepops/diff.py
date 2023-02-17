@@ -24,7 +24,7 @@ def _deepdiff(a, b, list_as_set, change_types, filter_func, path=DeepPath()):
 
     if filter_func:
         if not filter_func(path, a, b):
-            return None, None
+            return type(a)(), type(a)()
 
 
     # raise errors if either of the supplied objects are not compound
@@ -42,7 +42,7 @@ def _deepdiff(a, b, list_as_set, change_types, filter_func, path=DeepPath()):
     # if they're the same, there's nothing to remove, nothing to update
 
     if a == b:
-        return None, None
+        return type(a)(), type(a)()
 
 
     if isinstance(a, list) and isinstance(b, list):
@@ -226,6 +226,11 @@ def deepdiff(a, b, list_as_set=False, change_types=False, filter_func=None):
     (according to type()) - a TypeError is raised otherwise - unless
     change_types is set to True.
 
+    If the two objects being compared are equal, empty objects of the
+    same type are returned.  For example, if two lists are compared and
+    found to be equal, two empty lists will be returned - nothing to
+    remove from the starting list and nothing to add to it.
+
     Keyword arguments:
 
     a -- the 'from' object
@@ -251,7 +256,9 @@ def deepdiff(a, b, list_as_set=False, change_types=False, filter_func=None):
     DeepPath object], a, b) and returns a boolean specifying whether to
     act on this level or skip it: it can be used to filter at specific
     levels, perform some other action or raise an exception, if a
-    particular level is problematic
+    particular level is problematic.  For any particular level, if it
+    is filtered out, empty objects of the same type will be returned for
+    the remove and update values.
     """
 
     return _deepdiff(a, b, list_as_set, change_types, filter_func)
