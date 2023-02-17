@@ -1,18 +1,21 @@
+.PHONY: all
 all: deepops
 
-.PHONY: remake deepops upload clean tests
-
-
+.PHONY: remake
 remake: clean all
 
+.PHONY: deepops
 deepops:
 	./setup.py sdist bdist_wheel
 
+.PHONY: upload
 upload:
 	python3 -m twine upload dist/*
 
+.PHONY: clean
 clean:
 	rm -rf build dist deepops.egg-info
 
-tests:
-	python3 tests/test_deepops.py
+.PHONY: test_deepops
+test_deepops:
+	python3 -m test_deepops

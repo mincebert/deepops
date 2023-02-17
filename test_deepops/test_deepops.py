@@ -1,6 +1,5 @@
-#!/usr/bin/env python3
+# (deepops) test_deepops.test_deepops
 
-# test_deepops.py - unittests for deepops
 
 
 import unittest
@@ -9,6 +8,7 @@ from deepops import (
     deepmerge, deepremoveitems, deepfilter, deepdiff, deepsetdefault, deepget)
 
 from copy import deepcopy
+
 
 
 class TestDeepOps(unittest.TestCase):
@@ -456,12 +456,6 @@ class TestDeepOps(unittest.TestCase):
     # deepdiff() tests
 
 
-    def test_diff_equal_complex(self):
-        remove, update = deepdiff(self.x, self.x)
-        self.assertEqual(type(self.x)(), remove)
-        self.assertEqual(type(self.x)(), update)
-
-
     def test_diff_equal_list(self):
         list_ = [1, 2, { 11: "a", 12: "b" }]
         remove, update = deepdiff(list_, list_)
@@ -481,6 +475,12 @@ class TestDeepOps(unittest.TestCase):
         remove, update = deepdiff(dict_, dict_)
         self.assertEqual(dict(), remove)
         self.assertEqual(dict(), update)
+
+
+    def test_diff_equal_complex(self):
+        remove, update = deepdiff(self.x, self.x)
+        self.assertEqual(type(self.x)(), remove)
+        self.assertEqual(type(self.x)(), update)
 
 
     def test_diff_complex(self):
